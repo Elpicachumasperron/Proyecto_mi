@@ -1,40 +1,46 @@
-// Fondo animado con azules y negros
-const colors = [
-    '#0a1a2f', // negro azulado
-    '#001f3f', // azul oscuro
-    '#003366', // azul profundo
-    '#00509e', // azul medio
-    '#0a1a2f',  // para cerrar el ciclo
-    '#82aee7ff'
-];
-let step = 0;
-let colorIndex = 0;
-let nextColorIndex = 1;
-const stepsTotal = 200;
+// 🔹 Scroll suave al hacer clic en los enlaces del menú
+document.querySelectorAll('nav a').forEach(enlace => {
+  enlace.addEventListener('click', function (e) {
+    e.preventDefault();
+    const destino = document.querySelector(this.getAttribute('href'));
+    destino.scrollIntoView({
+      behavior: 'smooth'
+    });
+  });
+});
 
-function lerpColor(a, b, t) {
-    // Interpolación lineal entre dos colores hex
-    const ah = parseInt(a.replace('#', ''), 16);
-    const bh = parseInt(b.replace('#', ''), 16);
-    const ar = (ah >> 16) & 0xff, ag = (ah >> 8) & 0xff, ab = ah & 0xff;
-    const br = (bh >> 16) & 0xff, bg = (bh >> 8) & 0xff, bb = bh & 0xff;
-    const rr = Math.round(ar + (br - ar) * t);
-    const rg = Math.round(ag + (bg - ag) * t);
-    const rb = Math.round(ab + (bb - ab) * t);
-    return `rgb(${rr},${rg},${rb})`;
-}
+// 🔹 Animación de aparición en secciones
+const secciones = document.querySelectorAll('section');
 
-function animateBackground() {
-    step++;
-    if (step > stepsTotal) {
-        step = 0;
-        colorIndex = nextColorIndex;
-        nextColorIndex = (nextColorIndex + 1) % colors.length;
+const mostrarSeccion = (entries, observer) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
     }
-    const t = step / stepsTotal;
-    const color = lerpColor(colors[colorIndex], colors[nextColorIndex], t);
-    document.body.style.background = color;
-    requestAnimationFrame(animateBackground);
-}
+  });
+};
 
-animateBackground();
+const observer = new IntersectionObserver(mostrarSeccion, {
+  threshold: 0.2
+});
+
+secciones.forEach(seccion => {
+  observer.observe(seccion);
+});
+
+// 🔹 Animación botón de WhatsApp
+const whatsappBtn = document.querySelector('.whatsapp');
+setInterval(() => {
+  whatsappBtn.classList.toggle('pulse');
+}, 1000);
+
+// 🔹 Botón de modo oscuro
+const botonModo = document.createElement('button');
+botonModo.textContent = "🌙 / ☀️";
+botonModo.classList.add("modo-btn");
+document.querySelector("footer").appendChild(botonModo);
+
+botonModo.addEventListener("click", () => {
+  document.body.classList.toggle("modo-oscuro");
+});
